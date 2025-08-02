@@ -1,0 +1,131 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'de.bjusystems.vdrmanager.ng'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "de.bjusystems.vdrmanager.ng"
+        minSdk 24
+        targetSdk 34  // ❌ nicht "setTargetSdk", sondern "targetSdk"
+        versionCode 2
+        versionName "0.9"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+   signingConfigs {
+        debug {
+            // Standard-Debug-Key wird automatisch genutzt
+        }
+        release {
+            // Hier später Signing-Details eintragen, falls nötig
+            // storeFile file('path/to/keystore.jks')
+            // storePassword '...'
+            // keyAlias '...'
+            // keyPassword '...'
+            storeFile file('vdrmanager-release.jks')  // Pfad zum Keystore
+            storePassword 'rlhome'          // z. B. 'android'
+            keyAlias 'vdrmanager-key-alias'  // wie oben angegeben
+            keyPassword 'rlhome'             // z. B. 'android'
+        }
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix ".debug"
+            debuggable true
+            signingConfig signingConfigs.debug
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+            zipAlignEnabled true
+            signingConfig signingConfigs.release
+        }
+    }
+
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+
+    aaptOptions {
+        additionalParameters "--no-version-vectors"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    // Optional: falls du Kotlin nutzt (ktx), aktiviere auch Jetpack Compose oder andere Features
+    // buildFeatures {
+    //     viewBinding true
+    // }
+    
+    buildFeatures {
+        viewBinding true
+    }
+    
+    android.applicationVariants.all { variant ->
+        variant.outputs.all {
+            if (outputFileName.endsWith('.apk')) {
+                def newName = outputFileName.replace(".apk", "")
+                def flavor = variant.productFlavors.isEmpty() ? "" : variant.productFlavors[0].name
+                def buildType = variant.buildType.name
+                def versionName = variant.versionName
+                def versionCode = variant.versionCode
+
+                // Neuer Dateiname
+                outputFileName = "de.bjusystems.vdrmanager.ng-${flavor}${buildType}-${versionName}-${versionCode}.apk"
+                // Oder einfacher:
+                // outputFileName = "de.bjusystems.vdrmanager.ng-release.apk"
+            }
+        }
+    }
+
+}
+
+dependencies {
+    implementation 'androidx.core:core-ktx:1.10.1'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.drawerlayout:drawerlayout:1.2.0'
+    implementation 'androidx.activity:activity-ktx:1.7.2'
+    implementation 'androidx.annotation:annotation:1.7.1'
+    implementation 'androidx.fragment:fragment:1.6.2'
+    implementation 'androidx.viewpager:viewpager:1.0.0'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    
+    // RecyclerView
+    implementation 'androidx.recyclerview:recyclerview:1.3.2'
+
+    // ORMLite
+    implementation 'com.j256.ormlite:ormlite-android:5.1'
+    implementation 'com.j256.ormlite:ormlite-core:5.1'
+
+    // Logging
+    implementation 'org.slf4j:slf4j-android:1.7.36'
+
+    // Lokale JAR-Datei
+    implementation files('libs/svdrp4j-1.2.1.jar')
+
+    // Searchable Spinner
+    //implementation 'com.toptoche.searchablespinner:searchablespinnerlibrary:1.3.1'
+    //implementation 'com.github.miteshpithadiya:SearchableSpinner:master'
+    //implementation 'com.github.PonnamKarthik:SearchableSpinner:'
+
+    // Material Design
+    implementation 'com.google.android.material:material:1.9.0'
+
+    // Kotlin Standard Library – ausreichend ab 1.8+
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.9.22'  // ← nur das, kein jdk8!
+    
+    // Optional: Testabhängigkeiten
+    //testImplementation 'junit:junit:4.13.2'
+    //androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    //androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}

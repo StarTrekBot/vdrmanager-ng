@@ -1,0 +1,43 @@
+# -----------------------------
+# Build & IDE
+# -----------------------------
+/build/
+.gradle/
+local.properties
+*.iml
+.idea/
+*.hprof
+captures/
+debug/
+release/
+
+# -----------------------------
+# APKs
+# -----------------------------
+*.apk
+*.aab
+outputs/
+app/release/
+app/debug/
+
+# -----------------------------
+# Keystore & Secrets
+# -----------------------------
+vdrmanager-release.jks
+keystore.jks
+signing.properties
+secret.properties
+
+# -----------------------------
+# Logs
+# -----------------------------
+*.log
+logcat.log
+
+# -----------------------------
+# System
+# -----------------------------
+.DS_Store
+Thumbs.db
+*.swp
+*~
