@@ -13,7 +13,7 @@ aktualisiert für Android 10+ mit AndroidX, View Binding und verbessertem Code.
 
 ## 📦 Voraussetzungen
 - Android 8.0+ (API 24)
-- Zugriff auf einen VDR mit aktiviertem SVDRP
+- Zugriff auf einen VDR mit vdr-plugin-vdrmanager und aktiviertem SVDRP
 
 ## 📄 Lizenz
 Dieses Projekt ist unter der **GNU General Public License v2** lizenziert – wie das Originalprojekt.

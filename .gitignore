@@ -19,6 +19,7 @@ release/
 outputs/
 app/release/
 app/debug/
+build/
 
 # -----------------------------
 # Keystore & Secrets
@@ -33,7 +34,7 @@ secret.properties
 # -----------------------------
 *.log
 logcat.log
-
+*_bak
 # -----------------------------
 # System
 # -----------------------------
