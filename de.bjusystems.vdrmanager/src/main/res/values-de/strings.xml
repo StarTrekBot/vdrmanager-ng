@@ -39,9 +39,9 @@
   <string name="share_chooser">Share EPG Eintrag</string>
   <string name="about_text">Über \"VDR-Manager\" für Android\n
 Dies ist Version %1$s\n
-Falls sie zuhause einen VDR haben, der über Internet erreichbar ist, und sie ein Android-Smartphone besitzen werden sie das Programm eventuell nützlich finden.
+Falls sie zuhause einen VDR haben, der über das Netzwerk erreichbar ist, und sie ein Android-Smartphone besitzen werden sie das Programm eventuell nützlich finden.
 Für weitere Informationen besuchen sie https://github.com/vdr-projects/vdr-plugin-vdrmanager.\n
-Android APP auf SDK 34 portiert 2025 Rudirun\n ;</string>
+Android APP auf SDK 34 portiert 2025 StarTrekBot\n ;</string>
   <string name="about_title">Über</string>
   <string name="no_internet_connection">Keine Datenverbindung</string>
   <string name="update_will_start_in">Die Liste wird in einer Sekunde aktualisiert</string>

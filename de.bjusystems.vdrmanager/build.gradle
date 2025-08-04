@@ -10,7 +10,7 @@ android {
         applicationId "de.bjusystems.vdrmanager.ng"
         minSdk 24
         targetSdk 34  // ❌ nicht "setTargetSdk", sondern "targetSdk"
-        versionCode 2
+        versionCode 3
         versionName "0.9"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

@@ -23,7 +23,7 @@ Dieses Projekt ist unter der **GNU General Public License v2** lizenziert – wi
 ## 🔄 Unterschiede zum Original
 - AndroidX-Migration
 - Keine veralteten Bibliotheken
-- View Binding statt `findViewById`
+- View Binding statt `findViewById`  (noch offen)
 - Verbesserte Code-Struktur
 - Aktualisiertes Build-System (Gradle 8+)
 
