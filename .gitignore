@@ -25,6 +25,7 @@ build/
 # Keystore & Secrets
 # -----------------------------
 vdrmanager-release.jks
+keystore-base64.txt
 keystore.jks
 signing.properties
 secret.properties

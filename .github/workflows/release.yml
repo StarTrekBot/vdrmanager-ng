@@ -1,0 +1,44 @@
+name: Build & Release signed APK
+
+on:
+  push:
+    tags:
+      - 'v*'  # Triggert bei Tags wie v1.0.0
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Decode keystore
+      run: echo "${{ secrets.RELEASE_KEYSTORE }}" | base64 -d > app/vdrmanager-release.jks
+      # Achtung: Pfad muss mit dem in build.gradle übereinstimmen
+
+    - name: Grant execute permission to gradlew
+      run: chmod +x gradlew
+
+    - name: Build signed APK
+      run: ./gradlew assembleRelease
+      env:
+        STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        # Stelle sicher, dass build.gradle diese Variablen nutzt
+
+    - name: Upload APK to Release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: app/build/outputs/apk/release/app-release.apk
+        asset_name: de.bjusystems.vdrmanager.ng-release-${{ github.ref_name }}.apk
+        asset_content_type: application/vnd.android.package-archive
+        

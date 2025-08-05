@@ -16,35 +16,19 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
-   signingConfigs {
-        debug {
-            // Standard-Debug-Key wird automatisch genutzt
-        }
+    signingConfigs {
         release {
-            // Hier später Signing-Details eintragen, falls nötig
-            // storeFile file('path/to/keystore.jks')
-            // storePassword '...'
-            // keyAlias '...'
-            // keyPassword '...'
-            storeFile file('vdrmanager-release.jks')  // Pfad zum Keystore
-            storePassword 'rlhome'          // z. B. 'android'
-            keyAlias 'vdrmanager-key-alias'  // wie oben angegeben
-            keyPassword 'rlhome'             // z. B. 'android'
+            storeFile file('vdrmanager-release.jks')  // muss im Projekt-Root oder app/ liegen
+            storePassword System.getenv("STORE_PASSWORD") ?: "fallback"
+            keyAlias System.getenv("KEY_ALIAS")
+            keyPassword System.getenv("KEY_PASSWORD")
         }
     }
-
     buildTypes {
-        debug {
-            applicationIdSuffix ".debug"
-            debuggable true
-            signingConfig signingConfigs.debug
-        }
         release {
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
-            zipAlignEnabled true
-            signingConfig signingConfigs.release
         }
     }
 
