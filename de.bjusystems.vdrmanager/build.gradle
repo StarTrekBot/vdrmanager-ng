@@ -65,9 +65,9 @@ android {
                 def versionCode = variant.versionCode
 
                 // Neuer Dateiname
-                outputFileName = "de.bjusystems.vdrmanager.ng-${flavor}${buildType}-${versionName}-${versionCode}.apk"
+                //outputFileName = "de.bjusystems.vdrmanager.ng-${flavor}${buildType}-${versionName}-${versionCode}.apk"
                 // Oder einfacher:
-                // outputFileName = "de.bjusystems.vdrmanager.ng-release.apk"
+                outputFileName = "de.bjusystems.vdrmanager.ng-release.apk"
             }
         }
     }
