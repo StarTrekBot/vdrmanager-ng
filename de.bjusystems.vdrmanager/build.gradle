@@ -18,7 +18,7 @@ android {
 
     signingConfigs {
         release {
-            storeFile file('vdrmanager-release.jks')  // muss im Projekt-Root oder app/ liegen
+            storeFile file('../vdrmanager-release.jks')  // muss im Projekt-Root liegen
             storePassword System.getenv("STORE_PASSWORD") ?: "fallback"
             keyAlias System.getenv("KEY_ALIAS")
             keyPassword System.getenv("KEY_PASSWORD")

@@ -18,7 +18,7 @@ jobs:
         distribution: 'temurin'
 
     - name: Decode keystore
-      run: echo "${{ secrets.RELEASE_KEYSTORE }}" | base64 -d > app/vdrmanager-release.jks
+      run: echo "${{ secrets.RELEASE_KEYSTORE }}" | base64 -d > vdrmanager-release.jks
       # Achtung: Pfad muss mit dem in build.gradle übereinstimmen
 
     - name: Grant execute permission to gradlew
