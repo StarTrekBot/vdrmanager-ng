@@ -57,18 +57,7 @@ android {
     
     android.applicationVariants.all { variant ->
         variant.outputs.all {
-            if (outputFileName.endsWith('.apk')) {
-                def newName = outputFileName.replace(".apk", "")
-                def flavor = variant.productFlavors.isEmpty() ? "" : variant.productFlavors[0].name
-                def buildType = variant.buildType.name
-                def versionName = variant.versionName
-                def versionCode = variant.versionCode
-
-                // Neuer Dateiname
-                //outputFileName = "de.bjusystems.vdrmanager.ng-${flavor}${buildType}-${versionName}-${versionCode}.apk"
-                // Oder einfacher:
-                outputFileName = "de.bjusystems.vdrmanager.ng-release.apk"
-            }
+        outputFileName = "de.bjusystems.vdrmanager.ng-release.apk"
         }
     }
 

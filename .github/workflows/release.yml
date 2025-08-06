@@ -16,7 +16,6 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    # Keystore dekodieren → in Projekt-Root
     - name: Decode keystore
       run: echo "${{ secrets.RELEASE_KEYSTORE }}" | base64 -d > vdrmanager-release.jks
 
@@ -30,12 +29,10 @@ jobs:
         KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
 
-    - name: Upload APK to Release
-      uses: actions/upload-release-asset@v1
+    - name: Upload APK to GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: de.bjusystems.vdrmanager/build/outputs/apk/release/de.bjusystems.vdrmanager.ng-release.apk
+        name: de.bjusystems.vdrmanager.ng-release-${{ github.ref_name }}.apk
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: de.bjusystems.vdrmanager/build/outputs/apk/release/de.bjusystems.vdrmanager.ng-release.apk
-        asset_name: de.bjusystems.vdrmanager.ng-release-${{ github.ref_name }}.apk
-        asset_content_type: application/vnd.android.package-archive
