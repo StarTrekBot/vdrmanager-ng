@@ -30,11 +30,14 @@ import de.bjusystems.vdrmanager.ng.backup.IntentUtils;
 import de.bjusystems.vdrmanager.ng.data.Preferences;
 import de.bjusystems.vdrmanager.ng.data.Vdr;
 import de.bjusystems.vdrmanager.ng.data.db.DBAccess;
+import de.bjusystems.vdrmanager.ng.databinding.VdrListAddDeleteBinding;
 
 public class VdrListActivity extends AppCompatActivity implements
         OnItemClickListener, OnItemLongClickListener, View.OnClickListener {
 
     private static final String TAG = VdrListActivity.class.getName();
+
+    private VdrListAddDeleteBinding binding;
 
     List<Vdr> list = new ArrayList<Vdr>();
 
@@ -91,10 +94,11 @@ public class VdrListActivity extends AppCompatActivity implements
 
         populateIntent();
 
-        setContentView(R.layout.vdr_list_add_delete);
+        binding = VdrListAddDeleteBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
 
-        findViewById(R.id.new_vdr).setOnClickListener(this);
+        binding.newVdr.setOnClickListener(this);
 
         // initCursor();
         final Vdr cur = Preferences.get().getCurrentVdr();
@@ -167,13 +171,12 @@ public class VdrListActivity extends AppCompatActivity implements
         // }
         //
         // };
-        ListView listView = (ListView) findViewById(R.id.vdr_list);
-        listView.setAdapter(adapter);
-        registerForContextMenu(listView);
-        listView.setOnItemClickListener(this);
-        listView.setOnItemLongClickListener(this);
-        listView.setLongClickable(true);
-        listView.setEmptyView(findViewById(R.id.empty_view));
+        binding.vdrList.setAdapter(adapter);
+        registerForContextMenu(binding.vdrList);
+        binding.vdrList.setOnItemClickListener(this);
+        binding.vdrList.setOnItemLongClickListener(this);
+        binding.vdrList.setLongClickable(true);
+        binding.vdrList.setEmptyView(binding.emptyView);
     }
 
     /*

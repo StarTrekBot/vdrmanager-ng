@@ -27,8 +27,10 @@
 			        android:layout_width="fill_parent"
 			        android:layout_height="wrap_content"
 			        android:enabled="false"
+                    android:focusable="false"
 			       />
-			            				            
+
+
 			    <TextView
 			    android:paddingLeft="4.0dip" android:paddingBottom="2.0dip" android:layout_width="fill_parent"	android:layout_height="wrap_content" android:layout_marginTop="2.0dip"
 			        android:text="@string/timer_detail_title_title"/>
@@ -54,7 +56,9 @@
                    android:id="@+id/timer_detail_day"
                    android:layout_width="wrap_content"
                    android:layout_height="wrap_content"
-                   android:editable="false"/>        
+                   android:enabled="true"
+                   android:focusable="true"/>
+
 			    
                </LinearLayout>
                
@@ -69,7 +73,9 @@
                    android:layout_width="wrap_content"
                    android:layout_height="wrap_content"
                    android:text="@string/never"
-                   android:editable="false"/>        
+                   android:enabled="true"
+                   android:focusable="true"/>
+
 			    
                </LinearLayout>
                
@@ -91,7 +97,9 @@
 					         android:layout_width="wrap_content"
 					         android:layout_height="wrap_content"
 					         android:text="20:34"
-					         android:editable="false"/>
+					         android:enabled="true"
+                             android:focusable="true"/>
+
 	
 					     </LinearLayout>
 					     
@@ -104,7 +112,9 @@
 			         android:id="@+id/timer_detail_end"
 			         android:layout_width="wrap_content"
 			         android:layout_height="wrap_content"
-			         android:editable="false"/>
+			         android:enabled="true"
+                     android:focusable="true"/>
+
 		
 			     
 			</LinearLayout>
@@ -114,7 +124,14 @@
 			      <TextView android:width="80dp" android:text="@string/timer_detail_use_vps" android:layout_width="wrap_content" android:layout_height="wrap_content" />
 			      <CheckBox android:id="@+id/timer_detail_vps" android:layout_height="wrap_content" android:layout_width="wrap_content"/>
 			 </LinearLayout>
-			 
+
+             <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal">
+                  <TextView android:width="80dp" android:text="Active:" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                  <CheckBox android:id="@+id/timer_detail_active" android:layout_height="wrap_content" android:layout_width="wrap_content"/>
+             </LinearLayout>
+
+
+
 		 
 			 
 		    
@@ -122,7 +139,8 @@
 		     
 		    <TextView android:width="80dp" android:text="@string/timer_detail_priority" android:layout_width="wrap_content" android:layout_height="wrap_content" />
 		     
-		    <EditText android:layout_height="wrap_content" android:numeric="integer" android:id="@+id/timer_detail_priority"  android:layout_width="wrap_content" android:hint="@string/timer_detail_priority"/>
+		    <EditText android:layout_height="wrap_content" android:inputType="number" android:id="@+id/timer_detail_priority"  android:layout_width="wrap_content" android:hint="@string/timer_detail_priority"/>
+
 		    
 		    
 		    </LinearLayout>
@@ -131,7 +149,8 @@
 		     
 		    <TextView android:width="80dp" android:text="@string/timer_detail_lifetime" android:layout_width="wrap_content" android:layout_height="wrap_content" />
 		     
-		    <EditText android:layout_height="wrap_content"  android:numeric="integer" android:id="@+id/timer_detail_lifetime"  android:layout_width="wrap_content" android:hint="@string/timer_detail_lifetime_hint"/>
+		    <EditText android:layout_height="wrap_content"  android:inputType="number" android:id="@+id/timer_detail_lifetime"  android:layout_width="wrap_content" android:hint="@string/timer_detail_lifetime_hint"/>
+
 		    
 		    
 		    </LinearLayout>
@@ -154,7 +173,15 @@
 		android:layout_weight="1"
 		android:visibility="gone"
         android:text="@string/timer_details_save_title"/>
-    
+
+    <Button
+        android:id="@+id/timer_details_delete"
+        android:layout_width="0dip" android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:visibility="gone"
+        android:text="@string/timer_details_delete_title"/>
+
+
 
     <Button
         android:id="@+id/timer_details_save"

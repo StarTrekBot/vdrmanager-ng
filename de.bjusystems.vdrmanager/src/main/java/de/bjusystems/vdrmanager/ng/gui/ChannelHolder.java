@@ -1,10 +1,9 @@
 package de.bjusystems.vdrmanager.ng.gui;
 
-import android.widget.ImageView;
-import android.widget.TextView;
+import de.bjusystems.vdrmanager.ng.databinding.ChildLayoutBinding;
+import de.bjusystems.vdrmanager.ng.databinding.GroupLayoutBinding;
 
 class ChannelHolder {
-	public ImageView type;
-	public TextView name;
-	public TextView aux;
+	public ChildLayoutBinding childBinding;
+	public GroupLayoutBinding groupBinding;
 }

@@ -74,6 +74,7 @@ public class TimerDetailsActivity extends AppCompatActivity
         binding.timerDetailEnd.setOnClickListener(this);
         binding.timerDetailsSave.setOnClickListener(this);
         binding.timerDetailsModify.setOnClickListener(this);
+        binding.timerDetailsDelete.setOnClickListener(this);
         binding.timerDetailRepeat.setOnClickListener(this);
 
         // Aktuellen Timer holen
@@ -103,14 +104,18 @@ public class TimerDetailsActivity extends AppCompatActivity
         if (!timer.isVps() && !timer.hasVPS()) {
             binding.timerBlock.setVisibility(View.GONE);
         } else {
-            binding.timerDetailVps.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (isChecked) {
-                    vpsChecked(false);
-                } else {
-                    vpsUnchecked();
+            binding.timerDetailVps.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        vpsChecked(false);
+                    } else {
+                        vpsUnchecked();
+                    }
                 }
             });
         }
+
     }
 
     @Override
@@ -151,6 +156,7 @@ public class TimerDetailsActivity extends AppCompatActivity
         } else if (op == TimerOperation.MODIFY) {
             binding.timerDetailsSave.setVisibility(View.GONE);
             binding.timerDetailsModify.setVisibility(View.VISIBLE);
+            binding.timerDetailsDelete.setVisibility(View.VISIBLE);
             binding.timerDetailsSave.setText(R.string.timer_details_save_title);
             binding.timerDetailPriority.setText(String.valueOf(timer.getPriority()));
             binding.timerDetailLifetime.setText(String.valueOf(timer.getLifetime()));
@@ -173,6 +179,7 @@ public class TimerDetailsActivity extends AppCompatActivity
         EpgCache.CACHE.remove(timer.getChannelId());
         EpgCache.NEXT_REFRESH.remove(timer.getChannelId());
         binding.timerDetailVps.setChecked(timer.isVps());
+        binding.timerDetailActive.setChecked(timer.isEnabled());
     }
 
     private void updateDates(Date start, Date stop) {
@@ -233,12 +240,16 @@ public class TimerDetailsActivity extends AppCompatActivity
         } else if (view == binding.timerDetailsModify) {
             timer.setTitle(binding.timerDetailTitle.getText().toString());
             timer.setVps(binding.timerDetailVps.isChecked());
+            timer.setEnabled(binding.timerDetailActive.isChecked());
             timer.setPriority(getIntOr0(binding.timerDetailPriority));
             timer.setLifetime(getIntOr0(binding.timerDetailLifetime));
             modifyTimer(timer);
+        } else if (view == binding.timerDetailsDelete) {
+            deleteTimer(timer);
         } else if (view == binding.timerDetailsSave) {
             timer.setTitle(binding.timerDetailTitle.getText().toString());
             timer.setVps(binding.timerDetailVps.isChecked());
+            timer.setEnabled(binding.timerDetailActive.isChecked());
             timer.setPriority(getIntOr0(binding.timerDetailPriority));
             timer.setLifetime(getIntOr0(binding.timerDetailLifetime));
             createTimer(timer);
@@ -254,20 +265,29 @@ public class TimerDetailsActivity extends AppCompatActivity
                 weekdays[Calendar.SUNDAY],
             };
 
-            DaysOfWeek mNewDaysOfWeek = new DaysOfWeek(getSelectedItems().mDays);
+            final DaysOfWeek mNewDaysOfWeek = new DaysOfWeek(getSelectedItems().mDays);
 
-            new android.app.AlertDialog.Builder(this)
-                .setMultiChoiceItems(values, getSelectedItems().getBooleanArray(), (dialog, which, isChecked) -> mNewDaysOfWeek.set(which, isChecked))
-                .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                    StringBuilder sb = new StringBuilder(7);
-                    for (int i = 0; i < 7; i++) {
-                        sb.append(mNewDaysOfWeek.isSet(i) ? "MTWTFSS".charAt(i) : '-');
+            new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setMultiChoiceItems(values, getSelectedItems().getBooleanArray(), new DialogInterface.OnMultiChoiceClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                        mNewDaysOfWeek.set(which, isChecked);
                     }
-                    timer.setWeekdays(sb.toString());
-                    binding.timerDetailRepeat.setText(mNewDaysOfWeek.toString(this, true));
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        StringBuilder sb = new StringBuilder(7);
+                        for (int i = 0; i < 7; i++) {
+                            sb.append(mNewDaysOfWeek.isSet(i) ? "MTWTFSS".charAt(i) : '-');
+                        }
+                        timer.setWeekdays(sb.toString());
+                        binding.timerDetailRepeat.setText(mNewDaysOfWeek.toString(TimerDetailsActivity.this, true));
+                    }
                 })
                 .show();
+
         }
     }
 
@@ -331,7 +351,9 @@ public class TimerDetailsActivity extends AppCompatActivity
         new CreateTimerTask(this, timer) {
             @Override
             public void finished(SvdrpEvent event) {
-                done();
+                if (event == SvdrpEvent.FINISHED_SUCCESS) {
+                    done();
+                }
             }
         }.start();
     }
@@ -340,10 +362,25 @@ public class TimerDetailsActivity extends AppCompatActivity
         new ModifyTimerTask(this, timer, original) {
             @Override
             public void finished(SvdrpEvent event) {
-                done();
+                if (event == SvdrpEvent.FINISHED_SUCCESS) {
+                    done();
+                }
             }
         }.start();
     }
+
+    private void deleteTimer(Timer timer) {
+        Timer toDelete = original != null ? original : timer;
+        new de.bjusystems.vdrmanager.ng.tasks.DeleteTimerTask(this, toDelete) {
+            @Override
+            public void finished(SvdrpEvent event) {
+                if (event == SvdrpEvent.FINISHED_SUCCESS) {
+                    done();
+                }
+            }
+        }.start();
+    }
+
 
     public void done() {
         setResult(RESULT_OK);

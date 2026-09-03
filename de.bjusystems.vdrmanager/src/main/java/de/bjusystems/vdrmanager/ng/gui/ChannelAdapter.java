@@ -17,6 +17,8 @@ import android.widget.TextView;
 import de.bjusystems.vdrmanager.ng.R;
 import de.bjusystems.vdrmanager.ng.data.Channel;
 import de.bjusystems.vdrmanager.ng.data.Preferences;
+import de.bjusystems.vdrmanager.ng.databinding.ChildLayoutBinding;
+import de.bjusystems.vdrmanager.ng.databinding.GroupLayoutBinding;
 import de.bjusystems.vdrmanager.ng.utils.svdrp.ChannelClient;
 
 class ChannelAdapter extends BaseExpandableListAdapter implements Filterable// ,
@@ -75,18 +77,15 @@ class ChannelAdapter extends BaseExpandableListAdapter implements Filterable// ,
 
 		Channel item = (Channel) getChild(groupPosition, childPosition);
 
-		ChannelHolder itemHolder = new ChannelHolder();
+		ChannelHolder itemHolder = null;
 
 		// recycle view?
 		View view = convertView;
-		if (view == null) {
-			view = inflater.inflate(R.layout.child_layout, null);
+		if (view == null || (view.getTag() instanceof ChannelHolder == false) || ((ChannelHolder)view.getTag()).childBinding == null) {
+			ChildLayoutBinding childBinding = ChildLayoutBinding.inflate(inflater, parent, false);
+			view = childBinding.getRoot();
 			itemHolder = new ChannelHolder();
-
-			itemHolder.name = (TextView) view.findViewById(R.id.channel_name);
-			itemHolder.type = (ImageView) view.findViewById(R.id.channel_type);
-			itemHolder.aux = (TextView) view.findViewById(R.id.channel_aux);
-
+			itemHolder.childBinding = childBinding;
 			view.setTag(itemHolder);
 		} else {
 			itemHolder = (ChannelHolder) view.getTag();
@@ -100,16 +99,16 @@ class ChannelAdapter extends BaseExpandableListAdapter implements Filterable// ,
 		if (showChannelNumber) {
 			name = item.getNumber() + " - " + name;
 		}
-		itemHolder.name.setText(name);
+		itemHolder.childBinding.channelName.setText(name);
 
 		if (groupBy == ChannelListActivity.MENU_PROVIDER) {
-			itemHolder.aux.setText(item.getGroup());
+			itemHolder.childBinding.channelAux.setText(item.getGroup());
 		} else if(groupBy == ChannelListActivity.MENU_GROUP) {
-			itemHolder.aux.setText(item.getProvider());
+			itemHolder.childBinding.channelAux.setText(item.getProvider());
 		} else if(groupBy== ChannelListActivity.MENU_SOURCE){
-			itemHolder.aux.setText(item.getSource());
+			itemHolder.childBinding.channelAux.setText(item.getSource());
 		} else {
-			itemHolder.aux.setText(item.getProvider());
+			itemHolder.childBinding.channelAux.setText(item.getProvider());
 		}
 
 		return view;
@@ -144,25 +143,21 @@ class ChannelAdapter extends BaseExpandableListAdapter implements Filterable// ,
 
 		CharSequence groupDisplay = Utils.highlight(group, groupFilter);
 
-		ChannelHolder itemHolder = new ChannelHolder();
+		ChannelHolder itemHolder = null;
 
 		// recycle view?
 		View view = convertView;
-		if (view == null) {
-			view = inflater.inflate(R.layout.group_layout, null);
+		if (view == null || (view.getTag() instanceof ChannelHolder == false) || ((ChannelHolder)view.getTag()).groupBinding == null) {
+			GroupLayoutBinding groupBinding = GroupLayoutBinding.inflate(inflater, parent, false);
+			view = groupBinding.getRoot();
 			itemHolder = new ChannelHolder();
-
-			itemHolder.name = (TextView) view.findViewById(R.id.group_name);
-			itemHolder.aux = (TextView) view.findViewById(R.id.channel_count);
-			// itemHolder.type = (ImageView)
-			// view.findViewById(R.id.channel_type);
-
+			itemHolder.groupBinding = groupBinding;
 			view.setTag(itemHolder);
 		} else {
 			itemHolder = (ChannelHolder) view.getTag();
 		}
-		itemHolder.name.setText(groupDisplay);
-		itemHolder.aux.setText(String.valueOf(channelCount));
+		itemHolder.groupBinding.groupName.setText(groupDisplay);
+		itemHolder.groupBinding.channelCount.setText(String.valueOf(channelCount));
 
 		return view;
 

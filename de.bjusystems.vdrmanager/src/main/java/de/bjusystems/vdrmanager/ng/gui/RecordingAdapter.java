@@ -10,6 +10,7 @@ import de.bjusystems.vdrmanager.ng.data.EventFormatter;
 import de.bjusystems.vdrmanager.ng.data.EventListItem;
 import de.bjusystems.vdrmanager.ng.data.Recording;
 import de.bjusystems.vdrmanager.ng.data.RecordingListItem;
+import de.bjusystems.vdrmanager.ng.databinding.FolderItemBinding;
 
 class RecordingAdapter extends BaseEventAdapter<EventListItem> {
 
@@ -58,16 +59,7 @@ class RecordingAdapter extends BaseEventAdapter<EventListItem> {
 	}
 
 	class EventListItemFolderHolder {
-		public TextView folder;
-		public TextView count;
-	}
-
-	protected EventListItemFolderHolder getFolderViewHolder(EventListItem item,
-			View view) {
-		EventListItemFolderHolder itemHolder = new EventListItemFolderHolder();
-		itemHolder.folder = (TextView) view.findViewById(R.id.header_item);
-		itemHolder.count = (TextView) view.findViewById(R.id.count);
-		return itemHolder;
+		public FolderItemBinding binding;
 	}
 
 	@Override
@@ -84,16 +76,18 @@ class RecordingAdapter extends BaseEventAdapter<EventListItem> {
 		EventListItemFolderHolder holder = null;
 		if (convertView == null
 				|| (convertView != null && convertView.getTag() instanceof EventListItemFolderHolder) == false) {
-			convertView = inflater.inflate(R.layout.folder_item, null);
-			holder = getFolderViewHolder(item, convertView);
+			FolderItemBinding binding = FolderItemBinding.inflate(inflater, parent, false);
+			convertView = binding.getRoot();
+			holder = new EventListItemFolderHolder();
+			holder.binding = binding;
 			convertView.setTag(holder);
 		} else {
 			holder = (EventListItemFolderHolder) convertView.getTag();
 		}
 
-		holder.folder
+		holder.binding.headerItem
 				.setText(Utils.highlight(item.folder.getName(), highlight));
-		holder.count.setText(String.valueOf(item.folder.size()));
+		holder.binding.count.setText(String.valueOf(item.folder.size()));
 		return convertView;
 	}
 
@@ -115,20 +109,20 @@ class RecordingAdapter extends BaseEventAdapter<EventListItem> {
 
 		Recording r = (Recording) item.getEvent();
 		if (r.getTimerStopTime() != null) {
-			itemHolder.state.setImageResource(R.drawable.timer_recording);
+			itemHolder.binding.timerItemState.setImageResource(R.drawable.timer_recording);
 		} else {
-			itemHolder.state.setImageResource(R.drawable.timer_none);
-			itemHolder.other.setVisibility(View.GONE);
+			itemHolder.binding.timerItemState.setImageResource(R.drawable.timer_none);
+			itemHolder.binding.timerItemOther.setVisibility(View.GONE);
 			if (r.isNeww() == true) {
-				itemHolder.state.setImageResource(R.drawable.newrecording);
+				itemHolder.binding.timerItemState.setImageResource(R.drawable.newrecording);
 				if (r.isCut()) {
-					itemHolder.other.setVisibility(View.VISIBLE);
-					itemHolder.other.setImageResource(R.drawable.schere);
+					itemHolder.binding.timerItemOther.setVisibility(View.VISIBLE);
+					itemHolder.binding.timerItemOther.setImageResource(R.drawable.schere);
 				} else {
-					itemHolder.other.setVisibility(View.GONE);
+					itemHolder.binding.timerItemOther.setVisibility(View.GONE);
 				}
 			} else if (r.isCut()) {
-				itemHolder.state.setImageResource(R.drawable.schere);
+				itemHolder.binding.timerItemState.setImageResource(R.drawable.schere);
 			}
 		}
 

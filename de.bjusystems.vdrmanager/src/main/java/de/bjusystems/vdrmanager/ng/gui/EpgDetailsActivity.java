@@ -39,6 +39,8 @@ import de.bjusystems.vdrmanager.ng.data.Timer;
 import de.bjusystems.vdrmanager.ng.data.TimerMatch;
 import de.bjusystems.vdrmanager.ng.data.Timerable;
 import de.bjusystems.vdrmanager.ng.data.Timerable.TimerState;
+import de.bjusystems.vdrmanager.ng.databinding.EpgDetailBinding;
+import de.bjusystems.vdrmanager.ng.databinding.EpgdetailsBinding;
 import de.bjusystems.vdrmanager.ng.tasks.CreateTimerTask;
 import de.bjusystems.vdrmanager.ng.tasks.DeleteTimerTask;
 import de.bjusystems.vdrmanager.ng.tasks.ToggleTimerTask;
@@ -82,6 +84,8 @@ public class EpgDetailsActivity extends AppCompatActivity implements
     // private ImageView state;
 
     private boolean modifed = false;
+
+    private EpgdetailsBinding binding;
 
     // private int current;
 
@@ -155,12 +159,11 @@ public class EpgDetailsActivity extends AppCompatActivity implements
         }
 
         public Object instantiateItem(View pager, int position) {
-            View view = getLayoutInflater().inflate(R.layout.epg_detail, null);
-            // Event e = epgs.get(position);
-            publishEPG(view, position);
-            ((ViewPager) pager).addView(view, 0);
+            EpgDetailBinding binding = EpgDetailBinding.inflate(getLayoutInflater());
+            publishEPG(binding, position);
+            ((ViewPager) pager).addView(binding.getRoot(), 0);
 
-            return view;
+            return binding.getRoot();
         }
 
         public void destroyItem(View pager, int position, Object view) {
@@ -204,7 +207,8 @@ public class EpgDetailsActivity extends AppCompatActivity implements
         // R.layout.titlebar);
 
         // Attach view
-        setContentView(R.layout.epgdetails);
+        binding = EpgdetailsBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         // detector = new SimpleGestureFilter(this, this);
 
@@ -222,7 +226,7 @@ public class EpgDetailsActivity extends AppCompatActivity implements
         }
 
 
-        pager = (ViewPager) findViewById(R.id.viewpager);
+        pager = binding.viewpager;
         pager.setOnPageChangeListener(this);
 
 
@@ -288,7 +292,7 @@ public class EpgDetailsActivity extends AppCompatActivity implements
         }
     }
 
-    public void publishEPG(final View view, int position) {
+    public void publishEPG(final EpgDetailBinding binding, int position) {
 
         Event event = epgs.get(position);
 
@@ -298,28 +302,24 @@ public class EpgDetailsActivity extends AppCompatActivity implements
             timerable = (Timerable) event;
         }
 
-        view.setTag(event);
+        binding.getRoot().setTag(event);
         // view.setTag(event);
 
         final EventFormatter formatter = new EventFormatter(event);
 
-        final TextView title = (TextView) view
-                .findViewById(R.id.epg_detail_title);
         String titleText = formatter.getTitle();
-        title.setText(Utils.highlight(titleText, highlight));
+        binding.epgDetailTitle.setText(Utils.highlight(titleText, highlight));
         // title.setTextSize(TypedValue.COMPLEX_UNIT_PX, title.getTextSize()
         // * (float) 1.3);
 
-        ((TextView) view.findViewById(R.id.epg_detail_time)).setText(formatter
-                .getDate() + " " + formatter.getTime());
+        binding.epgDetailTime.setText(formatter.getDate() + " " + formatter.getTime());
 
-        TextView dura = (TextView) view.findViewById(R.id.epg_detail_duration);
+        TextView dura = binding.epgDetailDuration;
 
-        ((TextView) view.findViewById(R.id.epg_detail_channel)).setText(event
-                .getChannelName());
+        binding.epgDetailChannel.setText(event.getChannelName());
         // ((TextView) findViewById(R.id.epg_detail_date)).setText(formatter
         // .getLongDate());
-        ImageView state = (ImageView) view.findViewById(R.id.epg_timer_state);
+        ImageView state = binding.epgTimerState;
         if (timerable == null) {
             setState(state, R.drawable.timer_none);
         } else {
@@ -352,25 +352,18 @@ public class EpgDetailsActivity extends AppCompatActivity implements
                     setState(state, R.drawable.timer_none);
             }
         }
-        final TextView shortText = (TextView) view
-                .findViewById(R.id.epg_detail_shorttext);
-        shortText.setText(Utils.highlight(formatter.getShortText(), highlight));
+        binding.epgDetailShorttext.setText(Utils.highlight(formatter.getShortText(), highlight));
 
-        final TextView textView = (TextView) view
-                .findViewById(R.id.epg_detail_description);
-        textView.setText(Utils.highlight(formatter.getDescription(), highlight));
+        binding.epgDetailDescription.setText(Utils.highlight(formatter.getDescription(), highlight));
 
         if (event.getAudio().isEmpty() == false) {
-            view.findViewById(R.id.audio_block).setVisibility(View.VISIBLE);
-            final TextView audioTracks = (TextView) view
-                    .findViewById(R.id.epg_detail_audio);
-            audioTracks.setText(Utils.formatAudio(this, event.getAudio()));
+            binding.audioBlock.setVisibility(View.VISIBLE);
+            binding.epgDetailAudio.setText(Utils.formatAudio(this, event.getAudio()));
         } else {
-            view.findViewById(R.id.audio_block).setVisibility(View.GONE);
+            binding.audioBlock.setVisibility(View.GONE);
         }
 
-        TextView contentView = ((TextView) view
-                .findViewById(R.id.epg_detail_cats));
+        TextView contentView = binding.epgDetailCats;
         if (event.getContent().length > 0) {
             contentView.setVisibility(View.VISIBLE);
             contentView
@@ -386,8 +379,7 @@ public class EpgDetailsActivity extends AppCompatActivity implements
 
         int p = Utils.getProgress(event);
 
-        ((ProgressBar) view.findViewById(R.id.epg_detail_progress))
-                .setProgress(p);
+        binding.epgDetailProgress.setProgress(p);
         int dm = Utils.getDuration(event);
         if (Utils.isLive(event)) {
             int rest = dm - (dm * p / 100);
@@ -402,20 +394,17 @@ public class EpgDetailsActivity extends AppCompatActivity implements
 
         // register button handler
         if (timerable == null) {
-            view.findViewById(R.id.epg_event_create_timer).setVisibility(
-                    View.GONE);
+            binding.epgEventCreateTimer.setVisibility(View.GONE);
         } else {
-            setThisAsOnClickListener(view, R.id.epg_event_create_timer);
-            view.findViewById(R.id.epg_event_create_timer).setOnLongClickListener(this);
+            setThisAsOnClickListener(binding.epgEventCreateTimer);
+            binding.epgEventCreateTimer.setOnLongClickListener(this);
         }
 
-        View b = view.findViewById(R.id.epg_event_imdb);
-
         if (Preferences.get().isShowImdbButton() == false) {
-            b.setVisibility(View.GONE);
+            binding.epgEventImdb.setVisibility(View.GONE);
         } else {
-            b.setVisibility(View.VISIBLE);
-            b.setOnClickListener(new OnClickListener() {
+            binding.epgEventImdb.setVisibility(View.VISIBLE);
+            binding.epgEventImdb.setOnClickListener(new OnClickListener() {
 
                 public void onClick(View v) {
                     startFilmDatabaseBrowseIntent(
@@ -423,49 +412,44 @@ public class EpgDetailsActivity extends AppCompatActivity implements
 
                             )
                                     .getImdbUrl())
-                                    + IMDB_URL_QUERY, view, IMDB_URL_ENCODING);
+                                    + IMDB_URL_QUERY, binding.getRoot(), IMDB_URL_ENCODING);
                 }
             });
         }
 
-        b = view.findViewById(R.id.epg_event_omdb);
-
         if (Preferences.get().isShowOmdbButton() == false) {
-            b.setVisibility(View.GONE);
+            binding.epgEventOmdb.setVisibility(View.GONE);
         } else {
-            b.setVisibility(View.VISIBLE);
-            b.setOnClickListener(new OnClickListener() {
+            binding.epgEventOmdb.setVisibility(View.VISIBLE);
+            binding.epgEventOmdb.setOnClickListener(new OnClickListener() {
 
                 public void onClick(View v) {
-                    startFilmDatabaseBrowseIntent(OMDB_URL, view,
+                    startFilmDatabaseBrowseIntent(OMDB_URL, binding.getRoot(),
                             OMDB_URL_ENCODING);
                 }
             });
         }
 
-        b = view.findViewById(R.id.epg_event_tmdb);
-
         if (Preferences.get().isShowTmdbButton() == false) {
-            b.setVisibility(View.GONE);
+            binding.epgEventTmdb.setVisibility(View.GONE);
         } else {
-            b.setVisibility(View.VISIBLE);
-            b.setOnClickListener(new OnClickListener() {
+            binding.epgEventTmdb.setVisibility(View.VISIBLE);
+            binding.epgEventTmdb.setOnClickListener(new OnClickListener() {
 
                 public void onClick(View v) {
-                    startFilmDatabaseBrowseIntent(TMDB_URL, view,
+                    startFilmDatabaseBrowseIntent(TMDB_URL, binding.getRoot(),
                             TMDB_URL_ENCODING);
                 }
             });
         }
 
-        b = view.findViewById(R.id.epg_event_livetv);
         if (Utils.isLive(event) == false
                 && (event instanceof Recording == false || Preferences.get()
                 .isEnableRecStream() == false)) {
-            b.setVisibility(View.GONE);
+            binding.epgEventLivetv.setVisibility(View.GONE);
         } else {
-            b.setVisibility(View.VISIBLE);
-            setThisAsOnClickListener(b);
+            binding.epgEventLivetv.setVisibility(View.VISIBLE);
+            setThisAsOnClickListener(binding.epgEventLivetv);
         }
         // setThisAsOnClickListener(view, R.id.epg_event_left);
         // setThisAsOnClickListener(view, R.id.epg_event_right);
@@ -652,9 +636,12 @@ public class EpgDetailsActivity extends AppCompatActivity implements
 
                     }
                     if (res != -1) {
-                        setState(
-                                (ImageView) findViewById(R.id.epg_timer_state),
-                                res);
+                        Event currentEvent = epgs.get(pager.getCurrentItem());
+                        View view = pager.findViewWithTag(currentEvent);
+                        if (view != null) {
+                            EpgDetailBinding b = EpgDetailBinding.bind(view);
+                            setState(b.epgTimerState, res);
+                        }
                     }
                 }
             }
@@ -726,8 +713,12 @@ public class EpgDetailsActivity extends AppCompatActivity implements
             @Override
             public void finished(SvdrpEvent event) {
                 if (event == SvdrpEvent.FINISHED_SUCCESS) {
-                    setState((ImageView) findViewById(R.id.epg_timer_state),
-                            R.drawable.timer_none);
+                    Event currentEvent = epgs.get(pager.getCurrentItem());
+                    View view = pager.findViewWithTag(currentEvent);
+                    if (view != null) {
+                        EpgDetailBinding b = EpgDetailBinding.bind(view);
+                        setState(b.epgTimerState, R.drawable.timer_none);
+                    }
                     modifed = true;
                     EpgCache.CACHE.remove(timer.getChannelId());
                 }
@@ -786,6 +777,10 @@ public class EpgDetailsActivity extends AppCompatActivity implements
         String cn = cEvent.getChannelName();
         // View view = pager.getChildAt(arg0);
         // state = (ImageView) view.findViewById(R.id.epg_timer_state);
+        View view = pager.findViewWithTag(cEvent);
+        if (view != null) {
+            publishEPG(EpgDetailBinding.bind(view), position);
+        }
         setTitle(getString(R.string.epg_of_a_channel, cn, position + 1,
                 epgs.size()));
     }

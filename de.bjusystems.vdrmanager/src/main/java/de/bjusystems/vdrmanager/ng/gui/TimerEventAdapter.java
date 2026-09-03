@@ -22,10 +22,10 @@ public class TimerEventAdapter extends TimeEventAdapter {
 		super.handleState(itemHolder, item);
 		Timer r = (Timer) item.getEvent();
 		if (r.isVps()) {
-			itemHolder.other.setVisibility(View.VISIBLE);
-			itemHolder.other.setImageResource(R.drawable.timer_vps);
+			itemHolder.binding.timerItemOther.setVisibility(View.VISIBLE);
+			itemHolder.binding.timerItemOther.setImageResource(R.drawable.timer_vps);
 		} else {
-			itemHolder.other.setVisibility(View.GONE);
+			itemHolder.binding.timerItemOther.setVisibility(View.GONE);
 		}
 	}
 }

@@ -22,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -147,80 +148,31 @@ class ExternalFileBackup {
 	/**
 	 * Synchronously writes a backup to the given file.
 	 */
-	private void writeToFile(File outputFile) throws IOException {
+	public void writeToFile(File outputFile) throws IOException {
 		Log.d(Constants.TAG,
 				"Writing backup to file " + outputFile.getAbsolutePath());
+		writeToStream(new FileOutputStream(outputFile));
+	}
 
-		// Create all the auxiliary classes that will do the writing
-		//DatabaseDumper trackDumper = new DatabaseDumper(
-			//	BackupColumns.TRACKS_BACKUP_COLUMNS,
-				//BackupColumns.TRACKS_BACKUP_COLUMN_TYPES, false);
-		//DatabaseDumper waypointDumper = new DatabaseDumper(
-			//	BackupColumns.WAYPOINTS_BACKUP_COLUMNS,
-				//BackupColumns.WAYPOINTS_BACKUP_COLUMN_TYPES, false);
-		//DatabaseDumper pointDumper = new DatabaseDumper(
-			//	BackupColumns.POINTS_BACKUP_COLUMNS,
-				//BackupColumns.POINTS_BACKUP_COLUMN_TYPES, false);
-
-		// Open the target for writing
-		FileOutputStream outputStream = new FileOutputStream(outputFile);
+	public void writeToStream(OutputStream outputStream) throws IOException {
 		ZipOutputStream compressedStream = new ZipOutputStream(outputStream);
 		compressedStream.setLevel(COMPRESSION_LEVEL);
 		compressedStream.putNextEntry(new ZipEntry(ZIP_ENTRY_NAME));
 		DataOutputStream outWriter = new DataOutputStream(compressedStream);
 
 		try {
-			// Dump the entire contents of each table
-//			ContentResolver contentResolver = context.getContentResolver();
-//			Cursor tracksCursor = contentResolver.query(
-//					TracksColumns.CONTENT_URI, null, null, null, null);
-//			try {
-//				trackDumper.writeAllRows(tracksCursor, outWriter);
-//			} finally {
-//				tracksCursor.close();
-//			}
-//
-//			Cursor waypointsCursor = contentResolver.query(
-//					WaypointsColumns.CONTENT_URI, null, null, null, null);
-//			try {
-//				waypointDumper.writeAllRows(waypointsCursor, outWriter);
-//			} finally {
-//				waypointsCursor.close();
-//			}
-//
-//			Cursor pointsCursor = contentResolver.query(
-//					TrackPointsColumns.CONTENT_URI, null, null, null, null);
-//			try {
-//				pointDumper.writeAllRows(pointsCursor, outWriter);
-//			} finally {
-//				pointsCursor.close();
-//			}
-
 			// Dump preferences
 			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 			PreferenceBackupHelper preferencesHelper = new PreferenceBackupHelper();
 			preferencesHelper.exportPreferences(preferences, outWriter);
-			
-			
-			File f = new File(DBAccess.getDataBaseFile());
+
+			File f = new File(DBAccess.getDataBaseFile(context));
 			if(f.exists()){
 				compressedStream.putNextEntry(new ZipEntry(DBAccess.DATABASE_NAME));
-				IOUtils.copy(new FileInputStream(DBAccess.getDataBaseFile()), outWriter);
+				IOUtils.copy(new FileInputStream(DBAccess.getDataBaseFile(context)), outWriter);
 			}
 
-			
-		
-			
-			
-			
 		} catch (IOException e) {
-			// We tried to delete the partially created file, but do nothing
-			// if that also fails.
-			if (!outputFile.delete()) {
-				Log.w(Constants.TAG,
-						"Failed to delete file " + outputFile.getAbsolutePath());
-			}
-
 			throw e;
 		} finally {
 			compressedStream.closeEntry();
@@ -235,38 +187,63 @@ class ExternalFileBackup {
 		Log.d(Constants.TAG,
 				"Restoring from file " + inputFile.getAbsolutePath());
 
-	
-
 		ZipFile zipFile = new ZipFile(inputFile, ZipFile.OPEN_READ);
 		ZipEntry zipEntry = zipFile.getEntry(ZIP_ENTRY_NAME);
 		if (zipEntry == null) {
+			zipFile.close();
 			throw new IOException("Invalid backup ZIP file");
 		}
 
 		InputStream compressedStream = zipFile.getInputStream(zipEntry);
+		restoreFromStreams(compressedStream, zipFile);
+	}
+
+	public void restoreFromUri(android.net.Uri uri) throws IOException {
+		// SAF Uris need to be handled carefully.
+		// For ZipFile, we might need a local file.
+		// Or we can use ZipInputStream if we don't need random access.
+		// But here we need multiple entries.
+		
+		// Let's use ZipInputStream.
+		InputStream inputStream = context.getContentResolver().openInputStream(uri);
+		java.util.zip.ZipInputStream zis = new java.util.zip.ZipInputStream(inputStream);
+		java.util.zip.ZipEntry entry;
+		
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		PreferenceBackupHelper preferencesHelper = new PreferenceBackupHelper();
+
+		while ((entry = zis.getNextEntry()) != null) {
+			if (entry.getName().equals(ZIP_ENTRY_NAME)) {
+				DataInputStream reader = new DataInputStream(zis);
+				preferencesHelper.importPreferences(reader, preferences);
+			} else if (entry.getName().equals(DBAccess.DATABASE_NAME)) {
+				IOUtils.copy(zis, new FileOutputStream(DBAccess.getDataBaseFile(context)));
+				deleteJournal(DBAccess.getDataBaseFile(context));
+			}
+			zis.closeEntry();
+		}
+		zis.close();
+	}
+
+	private void restoreFromStreams(InputStream compressedStream, ZipFile zipFile) throws IOException {
 		DataInputStream reader = new DataInputStream(compressedStream);
-
 		try {
-
 			// Restore preferences
 			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 			PreferenceBackupHelper preferencesHelper = new PreferenceBackupHelper();
 			preferencesHelper.importPreferences(reader, preferences);
-			
-			
-			
-			
-			zipEntry = zipFile.getEntry(DBAccess.DATABASE_NAME);
+
+			ZipEntry zipEntry = zipFile.getEntry(DBAccess.DATABASE_NAME);
 			if (zipEntry != null) {
-				IOUtils.copy(zipFile.getInputStream(zipEntry), new FileOutputStream(DBAccess.getDataBaseFile()));
-				deleteJournal(DBAccess.getDataBaseFile());
+				IOUtils.copy(zipFile.getInputStream(zipEntry), new FileOutputStream(DBAccess.getDataBaseFile(context)));
+				deleteJournal(DBAccess.getDataBaseFile(context));
 			}
-			
 		} finally {
 			compressedStream.close();
 			zipFile.close();
 		}
 	}
+
 	
 	private static void deleteJournal(String db){
 		if(db == null){

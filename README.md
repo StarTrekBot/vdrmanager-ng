@@ -10,6 +10,7 @@ aktualisiert für Android 10+ mit AndroidX, View Binding und verbessertem Code.
 - Kanalliste
 - Fernbedienung
 - VPS-Unterstützung
+- Suchfunktion
 
 ## 📦 Voraussetzungen
 - Android 8.0+ (API 24)
@@ -23,7 +24,7 @@ Dieses Projekt ist unter der **GNU General Public License v2** lizenziert – wi
 ## 🔄 Unterschiede zum Original
 - AndroidX-Migration
 - Keine veralteten Bibliotheken
-- View Binding statt `findViewById`  (noch offen)
+- View Binding statt `findViewById` 
 - Verbesserte Code-Struktur
 - Aktualisiertes Build-System (Gradle 8+)
 

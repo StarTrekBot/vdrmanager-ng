@@ -233,29 +233,15 @@ public abstract class BaseEventListActivity<T extends Event> extends
 			sortByDialog.show();
 
 			return true;
+		} else if (id == R.id.epg_menu_search) {
+			onSearchRequested();
+			return true;
+		} else if (id == R.id.epg_menu_times) {
+			Intent intent = new Intent(this, EpgSearchTimesListActivity.class);
+			startActivity(intent);
+			return true;
 		}
-		//
-		// Hier kannst du weitere Menü-Items hinzufügen
-		// else if (id == R.id.epg_menu_search) {
-		//     super.onSearchRequested();
-		//     return true;
-		// } else if (id == R.id.epg_menu_times) {
-		//     Intent intent = new Intent(this, EpgSearchTimesListActivity.class);
-		//     startActivity(intent);
-		//     return true;
-		// }
 
-		// switch (item.getItemId()) {
-		// case R.id.epg_menu_search:
-		// startSearchManager();
-		// super.onSearchRequested();
-		// break;
-		// case R.id.epg_menu_times:
-		// intent = new Intent();
-		// /intent.setClass(this, EpgSearchTimesListActivity.class);
-		// startActivity(intent);
-		// break;
-		//}
 		return super.onOptionsItemSelected(item);
 	}
 
@@ -369,9 +355,9 @@ public abstract class BaseEventListActivity<T extends Event> extends
 		dialog.dismiss();
 	}
 
+	@Override
 	public boolean onSearchRequested() {
-		final InputMethodManager inputMgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-		inputMgr.toggleSoftInput(0, 0);
+		startSearchManager();
 		return true;
 	}
 

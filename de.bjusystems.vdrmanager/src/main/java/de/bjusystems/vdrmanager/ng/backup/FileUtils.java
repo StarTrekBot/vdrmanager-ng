@@ -67,9 +67,14 @@ public class FileUtils {
    */
   public static String buildExternalDirectoryPath(String... components) {
     StringBuilder dirNameBuilder = new StringBuilder();
-    dirNameBuilder.append(Environment.getExternalStorageDirectory());
+    File external = Environment.getExternalStorageDirectory();
+    if (external == null) {
+        return "";
+    }
+    dirNameBuilder.append(external.getAbsolutePath());
     dirNameBuilder.append(File.separatorChar);
     dirNameBuilder.append(Constants.SDCARD_TOP_DIR);
+
     for (String component : components) {
       dirNameBuilder.append(File.separatorChar);
       dirNameBuilder.append(component);

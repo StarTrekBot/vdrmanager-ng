@@ -506,4 +506,7 @@ Wie soll verfahren werden?</string>
   <string name="remapback_hint">Longpress on Back Button to leave the remote.</string>
   <string name="not_yet_implemented">Not Yet Implemented</string>
   <string name="timer_error">Can not create timer: %1$s</string>
+  <string name="settings_backup_to_file">In Datei sichern…</string>
+  <string name="settings_restore_from_file">Aus Datei wiederherstellen…</string>
 </resources>
+

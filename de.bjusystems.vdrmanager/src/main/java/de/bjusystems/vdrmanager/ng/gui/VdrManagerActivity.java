@@ -4,6 +4,8 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.SearchManager;
+import android.app.SearchableInfo;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -30,6 +32,7 @@ import android.widget.Toast;
 import com.j256.ormlite.android.AndroidDatabaseResults;
 
 import de.bjusystems.vdrmanager.ng.R;
+import de.bjusystems.vdrmanager.ng.databinding.VdrmanagerBinding;
 import de.bjusystems.vdrmanager.ng.app.Intents;
 import de.bjusystems.vdrmanager.ng.app.VdrManagerApp;
 import de.bjusystems.vdrmanager.ng.data.Preferences;
@@ -49,6 +52,9 @@ public class VdrManagerActivity extends AppCompatActivity implements
 
     //private SearchView search;
     private SearchView search;  // ✅ Deklaration der Variable
+    private MenuItem searchItem;
+
+    private VdrmanagerBinding binding;
 
     private View actionMenuWakup;
     private View actionMenuRemote;
@@ -123,22 +129,23 @@ public class VdrManagerActivity extends AppCompatActivity implements
         // this.getActionBar().setDisplayShowTitleEnabled(false);
         // setTitle(getString(R.string.app_name));
         // attach view
-        setContentView(R.layout.vdrmanager);
+        binding = VdrmanagerBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         // Preferences.loadPreferences(this);
 
-        findViewById(R.id.action_menu_channels).setOnClickListener(this);
-        findViewById(R.id.action_menu_recordings).setOnClickListener(this);
-        findViewById(R.id.action_menu_timers).setOnClickListener(this);
-        findViewById(R.id.action_menu_epg).setOnClickListener(this);
-        findViewById(R.id.action_menu_remote).setOnClickListener(this);
-//		View v = findViewById(R.id.action_menu_search);
-//		if (v != null) {
-//			v.setOnClickListener(this);
-//		}
+        binding.actionMenuChannels.setOnClickListener(this);
+        binding.actionMenuRecordings.setOnClickListener(this);
+        binding.actionMenuTimers.setOnClickListener(this);
+        binding.actionMenuEpg.setOnClickListener(this);
+        binding.actionMenuRemote.setOnClickListener(this);
+        if (binding.actionMenuSearch != null) {
+            binding.actionMenuSearch.setOnClickListener(this);
+        }
+
         //findViewById(R.id.main_logo).setOnClickListener(this);
-        actionMenuWakup = findViewById(R.id.action_menu_wakeup);
-        actionMenuRemote = findViewById(R.id.action_menu_remote);
+        actionMenuWakup = binding.actionMenuWakeup;
+        actionMenuRemote = binding.actionMenuRemote;
         // add and register buttons
         // createButtons();
         checkAndRequestPermission();
@@ -151,7 +158,7 @@ public class VdrManagerActivity extends AppCompatActivity implements
 
         // search = new SearchView(getSupportActionBar().getThemedContext());
         ////search = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.menu_search));
-        MenuItem searchItem = menu.findItem(R.id.menu_search);
+        searchItem = menu.findItem(R.id.menu_search);
         search = (SearchView) searchItem.getActionView();
         // search = (SearchView)
         // .getActionView();
@@ -159,8 +166,11 @@ public class VdrManagerActivity extends AppCompatActivity implements
         // Object o = menu.findItem(R.id.menu_search);
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        search.setSearchableInfo(searchManager
-                .getSearchableInfo(getComponentName()));
+        SearchableInfo searchableInfo = searchManager
+                .getSearchableInfo(new ComponentName(this, EpgSearchListActivity.class));
+        if (searchableInfo != null && search != null) {
+            search.setSearchableInfo(searchableInfo);
+        }
 
         //search.setOnQueryTextListener(this);
         return true;
@@ -320,7 +330,10 @@ public class VdrManagerActivity extends AppCompatActivity implements
             startActivity(TimerListActivity.class);
         } else if (id == R.id.action_menu_epg) {
             startActivity(TimeEpgListActivity.class);
+        } else if (id == R.id.action_menu_search) {
+            onSearchRequested();
         } else if (id == R.id.action_menu_wakeup) {
+
             final AsyncWakeupTask wakeupTask = new AsyncWakeupTask(this);
             wakeupTask.execute();
         } else if (id == R.id.main_logo) {
@@ -340,10 +353,15 @@ public class VdrManagerActivity extends AppCompatActivity implements
 
     @Override
     public boolean onSearchRequested() {
-        search.setVisibility(View.VISIBLE);
-        // Bundle appData = new Bundle();
-        // appData.putBoolean(SearchableActivity.JARGON, true);
-        // startSearch(null, false, appData, false);
+        if (searchItem != null) {
+            searchItem.expandActionView();
+            if (search != null) {
+                search.requestFocus();
+                search.setIconified(false);
+            }
+        } else {
+            startSearch(null, false, null, false);
+        }
         return true;
     }
 

@@ -9,11 +9,12 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.SearchView;
+import androidx.appcompat.widget.SearchView;
 
 import java.io.Serializable;
 
 import de.bjusystems.vdrmanager.ng.R;
+import de.bjusystems.vdrmanager.ng.databinding.SearchableListDialogBinding;
 
 public class FaListDialog extends Dialog implements
         SearchView.OnQueryTextListener, SearchView.OnCloseListener {
@@ -41,9 +42,9 @@ public class FaListDialog extends Dialog implements
         // getting the instance from the saved instance
         // Change End
 
-        View rootView = inflater.inflate(R.layout.searchable_list_dialog, null);
+        SearchableListDialogBinding binding = SearchableListDialogBinding.inflate(inflater);
 
-        final ListView viewById = (ListView) rootView.findViewById(R.id.listItems);
+        final ListView viewById = binding.listItems;
         viewById.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -54,7 +55,7 @@ public class FaListDialog extends Dialog implements
                 FaListDialog.this.dismiss();
             }
         });
-        ((SearchView) rootView.findViewById(R.id.search_view)).setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        binding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 return false;
@@ -70,7 +71,7 @@ public class FaListDialog extends Dialog implements
 //        //create the adapter by passing your ArrayList data
         listAdapter = ArrayAdapter.createFromResource(getContext(), R.array.font, R.layout.simple_list_item_1_fa);
         viewById.setAdapter(listAdapter);
-        setContentView(rootView);
+        setContentView(binding.getRoot());
     }
 
     @Override

@@ -15,6 +15,7 @@ import de.bjusystems.vdrmanager.ng.R;
 import de.bjusystems.vdrmanager.ng.app.VdrManagerApp;
 import de.bjusystems.vdrmanager.ng.data.EventListItem;
 import de.bjusystems.vdrmanager.ng.data.Timer;
+import de.bjusystems.vdrmanager.ng.databinding.TimerListBinding;
 import de.bjusystems.vdrmanager.ng.utils.date.DateFormatter;
 import de.bjusystems.vdrmanager.ng.utils.svdrp.SvdrpAsyncTask;
 import de.bjusystems.vdrmanager.ng.utils.svdrp.SvdrpClient;
@@ -27,6 +28,8 @@ import de.bjusystems.vdrmanager.ng.utils.svdrp.TimerClient;
  */
 public class TimerListActivity extends BaseTimerEditActivity<Timer> implements
 OnItemClickListener {
+
+  private TimerListBinding binding;
 
   private static final int MENU_NEW_TIMER = 2;
 
@@ -45,13 +48,14 @@ OnItemClickListener {
   protected void onCreate(final Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     // Attach view
-    // setContentView(getMainLayout());
+    binding = TimerListBinding.inflate(getLayoutInflater());
+    setContentView(binding.getRoot());
 
     // create an adapter
     adapter = new TimerEventAdapter(this);
 
     // attach adapter to ListView
-    listView = (ListView) findViewById(R.id.timer_list);
+    listView = binding.timerList;
     listView.setAdapter(adapter);
     listView.setFastScrollEnabled(true);
     listView.setTextFilterEnabled(true);

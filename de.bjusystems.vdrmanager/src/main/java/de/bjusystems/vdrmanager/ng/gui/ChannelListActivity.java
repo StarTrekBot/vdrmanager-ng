@@ -26,6 +26,7 @@ import de.bjusystems.vdrmanager.ng.R;
 import de.bjusystems.vdrmanager.ng.data.Channel;
 import de.bjusystems.vdrmanager.ng.data.P;
 import de.bjusystems.vdrmanager.ng.data.Preferences;
+import de.bjusystems.vdrmanager.ng.databinding.ChannelListBinding;
 import de.bjusystems.vdrmanager.ng.data.RecenteChannel;
 import de.bjusystems.vdrmanager.ng.data.db.DBAccess;
 import de.bjusystems.vdrmanager.ng.tasks.VoidAsyncTask;
@@ -60,6 +61,8 @@ public class ChannelListActivity extends
 	 * The Prefs.
 	 */
 	Preferences prefs;
+
+	private ChannelListBinding binding;
 
 	// private static final LinkedList<Channel> RECENT = new
 	// LinkedList<Channel>();
@@ -114,7 +117,9 @@ public class ChannelListActivity extends
 				Thread.getDefaultUncaughtExceptionHandler()));
 
 		// Attach view
-		
+		binding = ChannelListBinding.inflate(getLayoutInflater());
+		setContentView(binding.getRoot());
+
 		setTitle(getWindowTitle());
 		initFlipper();
 
@@ -124,7 +129,7 @@ public class ChannelListActivity extends
 
 		adapter = new ChannelAdapter(this);
 
-		listView = (ExpandableListView) findViewById(R.id.channel_list);
+		listView = binding.channelList;
 		listView.setOnChildClickListener(this);
 		listView.setTextFilterEnabled(true);
 		listView.setFastScrollEnabled(true);

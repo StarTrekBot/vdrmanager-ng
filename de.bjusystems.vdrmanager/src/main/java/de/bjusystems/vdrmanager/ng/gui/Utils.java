@@ -624,10 +624,14 @@ public class Utils {
      * @param msg the msg
      */
     public static void say(final Context ctx, final String msg) {
+        if (ctx == null || msg == null) {
+            return;
+        }
         final Toast t = Toast.makeText(ctx, msg, Toast.LENGTH_SHORT);
         t.setGravity(Gravity.CENTER, 0, 0);
         t.show();
     }
+
 
     /**
      * Encode url path string.

@@ -66,12 +66,19 @@ public abstract class BaseTimerEditActivity<T extends Event> extends
 			intent.putExtra(Intents.TIMER_OP, Intents.EDIT_TIMER);
 			startActivityForResult(intent, TimerDetailsActivity.REQUEST_CODE_TIMER_EDIT);
 		} else if (id == R.id.epg_item_menu_timer_delete) {
-			backupViewSelection();
-			deleteTimer(getTimer(event));
+			Timer timer = getTimer(event);
+			if (timer != null) {
+				backupViewSelection();
+				deleteTimer(timer);
+			}
 		} else if (id == R.id.epg_item_menu_timer_toggle) {
-			backupViewSelection();
-			toggleTimer(getTimer(event));
+			Timer timer = getTimer(event);
+			if (timer != null) {
+				backupViewSelection();
+				toggleTimer(timer);
+			}
 		} else {
+
 			return super.onContextItemSelected(item);
 		}
 
@@ -146,9 +153,15 @@ public abstract class BaseTimerEditActivity<T extends Event> extends
 	}
 
 	protected void toggleTimer(final Timer timer) {
+		if (timer == null) {
+			return;
+		}
 		final ToggleTimerTask task = new ToggleTimerTask(this, timer) {
 			@Override
 			public void finished(SvdrpEvent event) {
+				if (isFinishing()) {
+					return;
+				}
 				timerModified(timer);
 				restoreViewSelection();
 			}
@@ -156,22 +169,30 @@ public abstract class BaseTimerEditActivity<T extends Event> extends
 		task.start();
 	}
 
+
 	/**
 	 * Delete a given timer
 	 *
 	 * @param timer
 	 */
 	protected void deleteTimer(final Timer timer) {
+		if (timer == null) {
+			return;
+		}
 		// backupViewSelection();
 		final DeleteTimerTask task = new DeleteTimerTask(this, timer) {
 			@Override
 			public void finished(SvdrpEvent event) {
+				if (isFinishing()) {
+					return;
+				}
 				timerModified(timer);
 				restoreViewSelection();
 			}
 		};
 		task.start();
 	}
+
 
 	protected void timerModified() {
 		timerModified(null);

@@ -18,18 +18,28 @@ package de.bjusystems.vdrmanager.ng.backup;
 
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceManager;
 import androidx.core.content.ContextCompat;
+import android.util.Log;
 import android.widget.Toast;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import de.bjusystems.vdrmanager.ng.R;
 import de.bjusystems.vdrmanager.ng.gui.Utils;
@@ -43,6 +53,9 @@ public class BackupSettingsActivity extends AbstractSettingsActivity {
 
     private static final int DIALOG_CONFIRM_RESTORE_ID = 0;
 
+    private static final int REQUEST_CODE_BACKUP = 101;
+    private static final int REQUEST_CODE_RESTORE = 102;
+
 
     /**
      * The Backup preference.
@@ -52,6 +65,9 @@ public class BackupSettingsActivity extends AbstractSettingsActivity {
      * The Restore preference.
      */
     Preference restorePreference;
+
+    Preference backupToFilePreference;
+    Preference restoreFromFilePreference;
 
     /*
      * Note that sharedPreferenceChangeListenr cannot be an anonymous inner class.
@@ -106,8 +122,152 @@ public class BackupSettingsActivity extends AbstractSettingsActivity {
             }
         });
 
+        backupToFilePreference = findPreference(getString(R.string.settings_backup_to_file_key));
+        if (backupToFilePreference != null) {
+            backupToFilePreference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    startSAFBackup();
+                    return true;
+                }
+            });
+        }
 
+        restoreFromFilePreference = findPreference(getString(R.string.settings_restore_from_file_key));
+        if (restoreFromFilePreference != null) {
+            restoreFromFilePreference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    startSAFRestore();
+                    return true;
+                }
+            });
+        }
     }
+
+    private void startSAFBackup() {
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("application/zip");
+        String fileName = "vdrmanager-backup-" + new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + ".zip";
+        intent.putExtra(Intent.EXTRA_TITLE, fileName);
+        startActivityForResult(intent, REQUEST_CODE_BACKUP);
+    }
+
+    private void startSAFRestore() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("application/zip");
+        startActivityForResult(intent, REQUEST_CODE_RESTORE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode != RESULT_OK || data == null || data.getData() == null) {
+            return;
+        }
+
+        final Uri uri = data.getData();
+        if (requestCode == REQUEST_CODE_BACKUP) {
+            performSAFBackup(uri);
+        } else if (requestCode == REQUEST_CODE_RESTORE) {
+            performSAFRestore(uri);
+        }
+    }
+
+    private void performSAFBackup(final Uri uri) {
+        new AsyncTask<Void, Void, Boolean>() {
+            private ProgressDialog progressDialog;
+
+            @Override
+            protected void onPreExecute() {
+                progressDialog = DialogUtils.createSpinnerProgressDialog(BackupSettingsActivity.this,
+                        R.string.settings_backup_now_progress_message, null);
+                progressDialog.show();
+            }
+
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                OutputStream os = null;
+                try {
+                    os = getContentResolver().openOutputStream(uri);
+                    ExternalFileBackup backup = new ExternalFileBackup(BackupSettingsActivity.this);
+                    backup.writeToStream(os);
+                    return true;
+                } catch (IOException e) {
+                    Log.e("Backup", "Error during SAF backup", e);
+                    return false;
+                } finally {
+                    IOUtils.closeQuietly(os);
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Boolean success) {
+                if (progressDialog != null && progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                }
+                Toast.makeText(BackupSettingsActivity.this,
+                        success ? R.string.sd_card_save_success : R.string.sd_card_save_error,
+                        Toast.LENGTH_SHORT).show();
+            }
+        }.execute();
+    }
+
+    private void performSAFRestore(final Uri uri) {
+        DialogUtils.createConfirmationDialog(this,
+                R.string.settings_backup_restore_confirm_message, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        executeSAFRestore(uri);
+                    }
+                }).show();
+    }
+
+    private void executeSAFRestore(final Uri uri) {
+        new AsyncTask<Void, Void, Boolean>() {
+            private ProgressDialog progressDialog;
+
+            @Override
+            protected void onPreExecute() {
+                progressDialog = DialogUtils.createSpinnerProgressDialog(BackupSettingsActivity.this,
+                        R.string.settings_backup_restore_progress_message, null);
+                progressDialog.show();
+            }
+
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                try {
+                    ExternalFileBackup backup = new ExternalFileBackup(BackupSettingsActivity.this);
+                    backup.restoreFromUri(uri);
+                    return true;
+                } catch (IOException e) {
+                    Log.e("Restore", "Error during SAF restore", e);
+                    return false;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Boolean success) {
+                if (progressDialog != null && progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                }
+                Toast.makeText(BackupSettingsActivity.this,
+                        success ? R.string.sd_card_import_success : R.string.sd_card_import_error,
+                        Toast.LENGTH_SHORT).show();
+                if (success) {
+                    Intent intent = new Intent(BackupSettingsActivity.this, de.bjusystems.vdrmanager.ng.gui.PreferencesActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    finish();
+                }
+            }
+
+        }.execute();
+    }
+
+
 
     @Override
     protected Dialog onCreateDialog(int id) {

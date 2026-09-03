@@ -16,6 +16,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import de.bjusystems.vdrmanager.ng.R;
+import de.bjusystems.vdrmanager.ng.databinding.EpgEventItemBinding;
+import de.bjusystems.vdrmanager.ng.databinding.HeaderItemBinding;
 import de.bjusystems.vdrmanager.ng.data.Event;
 import de.bjusystems.vdrmanager.ng.data.EventFormatter;
 import de.bjusystems.vdrmanager.ng.data.EventListItem;
@@ -81,7 +83,7 @@ abstract class BaseEventAdapter<T extends EventListItem> extends
 	}
 
 	public static class EventListItemHeaderHolder {
-		TextView header;
+		public HeaderItemBinding binding;
 	}
 
 	private boolean canReuseConvertView(View convertView, int itemViewType) {
@@ -113,12 +115,14 @@ abstract class BaseEventAdapter<T extends EventListItem> extends
 		if (canReuseConvertView(convertView, type) == false) {
 			switch (type) {
 			case TYPE_ITEM:
-				convertView = inflater.inflate(layout, null);
-				holder = getEventViewHolder(item, convertView);
+				EpgEventItemBinding binding = EpgEventItemBinding.inflate(inflater, parent, false);
+				convertView = binding.getRoot();
+				holder = getEventViewHolder(item, binding);
 				break;
 			case TYPE_HEADER:
-				convertView = inflater.inflate(R.layout.header_item, null);
-				holder = getHeaderViewHolder(item, convertView);
+				HeaderItemBinding headerBinding = HeaderItemBinding.inflate(inflater, parent, false);
+				convertView = headerBinding.getRoot();
+				holder = getHeaderViewHolder(item, headerBinding);
 				break;
 			}
 			convertView.setTag(holder);
@@ -129,33 +133,17 @@ abstract class BaseEventAdapter<T extends EventListItem> extends
 		if (type == TYPE_ITEM) {
 			fillEventViewHolder((EventListItemHolder) holder, item);
 		} else {
-			((EventListItemHeaderHolder) holder).header.setText(item
+			((EventListItemHeaderHolder) holder).binding.headerItem.setText(item
 					.getHeader());
 		}
 		return convertView;
 	}
 
 	protected EventListItemHolder getEventViewHolder(EventListItem item,
-			View view) {
+			EpgEventItemBinding binding) {
 
 		EventListItemHolder itemHolder = new EventListItemHolder();
-
-		itemHolder = new EventListItemHolder();
-
-		itemHolder.state = (ImageView) view.findViewById(R.id.timer_item_state);
-		itemHolder.other = (ImageView) view.findViewById(R.id.timer_item_other);
-		itemHolder.time = (TextView) view.findViewById(R.id.timer_item_time);
-		itemHolder.channel = (TextView) view
-				.findViewById(R.id.timer_item_channel);
-		itemHolder.title = (TextView) view.findViewById(R.id.timer_item_title);
-		itemHolder.progress = (ProgressBar) view
-				.findViewById(R.id.timer_progress);
-		itemHolder.shortText = (TextView) view
-				.findViewById(R.id.timer_item_shorttext);
-		itemHolder.duration = (TextView) view
-				.findViewById(R.id.timer_item_duration);
-		itemHolder.description = (TextView) view
-				.findViewById(R.id.event_item_description);
+		itemHolder.binding = binding;
 		return itemHolder;
 	}
 
@@ -165,32 +153,32 @@ abstract class BaseEventAdapter<T extends EventListItem> extends
 			TimerMatch match = ((Timerable) item.getEvent()).getTimerMatch();
 			switch (((Timerable) item.getEvent()).getTimerState()) {
 			case Active:
-				itemHolder.state.setImageResource(Utils.getTimerStateDrawable(
+				itemHolder.binding.timerItemState.setImageResource(Utils.getTimerStateDrawable(
 						match, R.drawable.timer_active,
 						R.drawable.timer_active_begin,
 						R.drawable.timer_active_end,
 						R.drawable.timer_active_conflict));
 				break;
 			case Inactive:
-				itemHolder.state.setImageResource(Utils.getTimerStateDrawable(
+				itemHolder.binding.timerItemState.setImageResource(Utils.getTimerStateDrawable(
 						match, R.drawable.timer_inactive,
 						R.drawable.timer_inactive_begin,
 						R.drawable.timer_inactive_end,
 						R.drawable.timer_inactive));
 				break;
 			case Recording:
-				itemHolder.state.setImageResource(Utils.getTimerStateDrawable(
+				itemHolder.binding.timerItemState.setImageResource(Utils.getTimerStateDrawable(
 						match, R.drawable.timer_recording,
 						R.drawable.timer_recording_begin,
 						R.drawable.timer_recording_end,
 						R.drawable.timer_recording_conflict));
 				break;
 			case None:
-				itemHolder.state.setImageResource(R.drawable.timer_none);
+				itemHolder.binding.timerItemState.setImageResource(R.drawable.timer_none);
 				break;
 			}
 		} else {
-			itemHolder.state.setImageResource(R.drawable.timer_none);
+			itemHolder.binding.timerItemState.setImageResource(R.drawable.timer_none);
 		}
 
 	}
@@ -198,59 +186,59 @@ abstract class BaseEventAdapter<T extends EventListItem> extends
 	public void fillEventViewHolder(EventListItemHolder itemHolder,
 			EventListItem item) {
 
-		itemHolder.state.setVisibility(View.VISIBLE);
+		itemHolder.binding.timerItemState.setVisibility(View.VISIBLE);
 
 		handleState(itemHolder, item);
 
 		final EventFormatter formatter = getEventFormatter(item);
-		itemHolder.time.setText(formatter.getTime());
+		itemHolder.binding.timerItemTime.setText(formatter.getTime());
 		if (hideChannelName) {
-			itemHolder.channel.setVisibility(View.GONE);
+			itemHolder.binding.timerItemChannel.setVisibility(View.GONE);
 		} else {
-			itemHolder.channel.setText(item.getChannelName());
+			itemHolder.binding.timerItemChannel.setText(item.getChannelName());
 		}
 
 		CharSequence title = Utils.highlight(formatter.getTitle(), highlight);
 		CharSequence shortText = Utils.highlight(formatter.getShortText(),
 				highlight);
-		itemHolder.title.setText(title);
-		itemHolder.shortText.setText(shortText);
+		itemHolder.binding.timerItemTitle.setText(title);
+		itemHolder.binding.timerItemShorttext.setText(shortText);
 
 		if (TextUtils.isEmpty(formatter.getDescription()) == false
 				&& hideDescription == false) {
 			Pair<Boolean, CharSequence> desc = Utils.highlight2(
 					formatter.getDescription(), highlight);
-			itemHolder.description.setVisibility(View.VISIBLE);
-			itemHolder.description.setText(desc.second);
+			itemHolder.binding.eventItemDescription.setVisibility(View.VISIBLE);
+			itemHolder.binding.eventItemDescription.setText(desc.second);
 		} else {
-			itemHolder.description.setVisibility(View.GONE);
+			itemHolder.binding.eventItemDescription.setVisibility(View.GONE);
 		}
 
 		// TODO better render of duration
 		int p = Utils.getProgress(item.getEvent());
 		if (p == -1) {
-			itemHolder.progress.setVisibility(View.GONE);
+			itemHolder.binding.timerProgress.setVisibility(View.GONE);
 			int dura = Utils.getDuration(item);
-			itemHolder.duration.setText(getContext().getString(
+			itemHolder.binding.timerItemDuration.setText(getContext().getString(
 					R.string.epg_duration_template, dura));
 		} else {
-			itemHolder.progress.setVisibility(View.VISIBLE);
-			itemHolder.progress.setProgress(p);
+			itemHolder.binding.timerProgress.setVisibility(View.VISIBLE);
+			itemHolder.binding.timerProgress.setProgress(p);
 			int dura = Utils.getDuration(item.getEvent());
 			int rest = dura - (dura * p / 100);
 			// on live recordings the amount of already recorded time
 			if (item.getEvent() instanceof Recording) {
 				rest = dura - rest;
 			}
-			itemHolder.duration.setText(getContext().getString(
+			itemHolder.binding.timerItemDuration.setText(getContext().getString(
 					R.string.epg_duration_template_live, rest, dura));
 		}
 	}
 
 	protected EventListItemHeaderHolder getHeaderViewHolder(EventListItem item,
-			View view) {
+			HeaderItemBinding binding) {
 		EventListItemHeaderHolder itemHolder = new EventListItemHeaderHolder();
-		itemHolder.header = (TextView) view.findViewById(R.id.header_item);
+		itemHolder.binding = binding;
 		return itemHolder;
 	}
 

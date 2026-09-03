@@ -467,6 +467,7 @@ public abstract class BaseActivity<Result, T extends ListView> extends
             case CONNECTION_TIMEOUT:
                 say(R.string.progress_connect_timeout);
                 switchNoConnection();
+                break;
             case CONNECT_ERROR:
                 say(R.string.progress_connect_error);
                 switchNoConnection();
@@ -489,12 +490,14 @@ public abstract class BaseActivity<Result, T extends ListView> extends
         if (isFinishing()) {
             return;
         }
+        String finalMsg = (msg != null) ? msg : "Unknown error";
         new AlertDialog.Builder(this)//
-                .setMessage(msg)//
+                .setMessage(finalMsg)//
                 .setPositiveButton(android.R.string.ok, null)//
                 .create()//
                 .show();//
     }
+
 
     protected void alert(final int resId) {
         alert(getString(resId));
@@ -527,8 +530,11 @@ public abstract class BaseActivity<Result, T extends ListView> extends
 
     @Override
     public void svdrpEvent(final SvdrpEvent event, final Throwable t) {
-        progress.dismiss();
-        Utils.say(this, t.getMessage());
+        if (progress != null && progress.isShowing()) {
+            progress.dismiss();
+        }
+        String msg = (t != null && t.getMessage() != null) ? t.getMessage() : getString(R.string.aborted);
+        Utils.say(this, msg);
     }
 
     protected void addListener(
@@ -547,10 +553,12 @@ public abstract class BaseActivity<Result, T extends ListView> extends
             case COMMAND_SENDING:
                 break;
             case CONNECTING:
-                progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                setMessage(R.string.progress_connect);
-                if (!isFinishing()) {
-                    progress.show();
+                if (progress != null) {
+                    progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                    setMessage(R.string.progress_connect);
+                    if (!isFinishing()) {
+                        progress.show();
+                    }
                 }
                 break;
             case LOGGED_IN:
@@ -565,11 +573,11 @@ public abstract class BaseActivity<Result, T extends ListView> extends
             case DISCONNECTED:
                 break;
             case ABORTED:
-                progress.dismiss();
+                dismissProgress();
                 say(R.string.aborted);
                 break;
             case ERROR:
-                progress.dismiss();
+                dismissProgress();
                 alert(R.string.epg_client_errors);
                 break;
             case CONNECTED:
@@ -579,21 +587,23 @@ public abstract class BaseActivity<Result, T extends ListView> extends
             case CONNECT_ERROR:
             case FINISHED_ABNORMALY:
             case LOGIN_ERROR:
-                progress.dismiss();
+                dismissProgress();
                 noConnection(event);
                 break;
             case CACHE_HIT:
-                progress.dismiss();
+                dismissProgress();
                 cacheHit();
                 return;
             case FINISHED_SUCCESS:
-                progress.dismiss();
+                dismissProgress();
                 break;
         }
-        // case RESULT_RECEIVED:
-        // resultReceived(result);
-        // break;
-        // }
+    }
+
+    private void dismissProgress() {
+        if (progress != null && progress.isShowing()) {
+            progress.dismiss();
+        }
     }
 
     protected int getProgressTextId() {
@@ -601,7 +611,9 @@ public abstract class BaseActivity<Result, T extends ListView> extends
     }
 
     private void setMessage(final int progressConnect) {
-        progress.setMessage(getString(progressConnect));
+        if (progress != null) {
+            progress.setMessage(getString(progressConnect));
+        }
     }
 
     protected boolean finishedSuccess = false;

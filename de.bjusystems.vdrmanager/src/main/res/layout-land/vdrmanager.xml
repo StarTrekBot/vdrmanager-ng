@@ -54,7 +54,18 @@
             android:text="@string/action_menu_recordings"
             android:textColor="#FFF" />
 
+        <Button
+            android:id="@+id/action_menu_search"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:drawable/list_selector_background"
+            android:drawableTop="@drawable/btn_search"
+            android:text="@string/action_menu_search"
+            android:textColor="#FFF" />
+
         </LinearLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"

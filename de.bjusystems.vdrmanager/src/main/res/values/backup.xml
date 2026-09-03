@@ -56,6 +56,11 @@
     <string name="settings_backup_key">settingsBackup</string>
     <string name="settings_backup_now_key">settingsBackupNow</string>
     <string name="settings_backup_restore_key">settingsBackupRestore</string>
+    <string name="settings_backup_to_file">Backup to file...</string>
+    <string name="settings_restore_from_file">Restore from file...</string>
+    <string name="settings_backup_to_file_key">settingsBackupToFile</string>
+    <string name="settings_restore_from_file_key">settingsRestoreFromFile</string>
     <string name="choose">Choose a backup file</string>
+
 
 </resources>

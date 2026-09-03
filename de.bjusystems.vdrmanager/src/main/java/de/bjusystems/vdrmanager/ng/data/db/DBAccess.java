@@ -38,8 +38,8 @@ public class DBAccess extends OrmLiteSqliteOpenHelper {
 
 	private RecentChannelDAO recentChannelDAO = null;
 
-	public static String getDataBaseFile() {
-		return "/data/data/de.bjusystems.vdrmanager.ng/databases/" + DATABASE_NAME;
+	public static String getDataBaseFile(Context context) {
+		return context.getDatabasePath(DATABASE_NAME).getAbsolutePath();
 	}
 
 	public DBAccess(Context context) {

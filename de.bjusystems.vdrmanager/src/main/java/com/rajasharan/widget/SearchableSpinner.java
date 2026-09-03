@@ -12,8 +12,9 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.TextView;
+
+import de.bjusystems.vdrmanager.ng.databinding.DialogDropdownBinding;
 import de.bjusystems.vdrmanager.ng.R;
 
 /**
@@ -105,18 +106,17 @@ public class SearchableSpinner extends ViewGroup implements TextWatcher, View.On
     private AlertDialog createDialog(Context context) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.dialog_dropdown, null);
+        DialogDropdownBinding binding = DialogDropdownBinding.inflate(inflater);
 
-        EditText filter = (EditText) view.findViewById(R.id.filter);
-        filter.setHint("\uD83D\uDD0D search");
-        filter.addTextChangedListener(this);
+        binding.filter.setHint("\uD83D\uDD0D search");
+        binding.filter.addTextChangedListener(this);
 
-        mRecycler = (RecyclerDropdown) view.findViewById(R.id.list);
+        mRecycler = binding.list;
         mRecycler.setOnClickListener(this);
         mRecycler.setDropdownList(mList);
         mRecycler.scrollToPosition(mList.length/2);
 
-        builder.setView(view);
+        builder.setView(binding.getRoot());
         return builder.create();
     }
 

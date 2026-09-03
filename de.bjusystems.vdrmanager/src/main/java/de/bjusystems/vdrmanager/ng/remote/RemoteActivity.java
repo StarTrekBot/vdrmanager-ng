@@ -53,6 +53,7 @@ import de.androvdr.widget.AnimatedTextView;
 import de.androvdr.widget.FontAwesome;
 import de.bjusystems.vdrmanager.ng.ButtonMapping;
 import de.bjusystems.vdrmanager.ng.R;
+import de.bjusystems.vdrmanager.ng.databinding.RemoteBinding;
 import de.bjusystems.vdrmanager.ng.backup.IOUtils;
 import de.bjusystems.vdrmanager.ng.data.Preferences;
 import de.bjusystems.vdrmanager.ng.gui.Utils;
@@ -80,6 +81,8 @@ public class RemoteActivity extends Activity implements OnClickListener, View.On
 
     private Connection connection;
 
+    private RemoteBinding binding;
+
     private AnimatedTextView result;
     private AlphaAnimation out;
     private AlphaAnimation in;
@@ -97,23 +100,23 @@ public class RemoteActivity extends Activity implements OnClickListener, View.On
 
         //Remove notification bar
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        View view = getLayoutInflater().inflate(R.layout.remote, null);
+        binding = RemoteBinding.inflate(getLayoutInflater());
 
-        setContentView(view);
+        setContentView(binding.getRoot());
 
-        dummyContextMenuView = view.findViewById(R.id.resultwrapper);
+        dummyContextMenuView = binding.resultwrapper;
         registerForContextMenu(dummyContextMenuView);
-        view.setOnLongClickListener(this);
+        binding.getRoot().setOnLongClickListener(this);
 
 
-        remoteroot = (ViewGroup) view.findViewById(R.id.remoteroot);
+        remoteroot = binding.remoteroot;
 
         //Button button = (Button) viewGroup.findViewById(R.id.red);
         //button.getBackground().setColorFilter(0xFF00FF00, PorterDuff.Mode.MULTIPLY);
 
         setAllButtonListener(remoteroot);
 
-        result = (AnimatedTextView) findViewById(R.id.result);
+        result = binding.result;
         //Animation in = AnimationUtils.loadAnimation(this,android.R.anim.fade_in);
         //Animation out = AnimationUtils.loadAnimation(this, android.R.anim.fade_out);
 /*      result.setInAnimation(in);

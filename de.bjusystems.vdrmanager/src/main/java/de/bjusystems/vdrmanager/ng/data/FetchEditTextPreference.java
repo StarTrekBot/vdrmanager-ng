@@ -9,8 +9,11 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import de.bjusystems.vdrmanager.ng.R;
+import de.bjusystems.vdrmanager.ng.databinding.FetchPreferenceBinding;
 
 public class FetchEditTextPreference extends DialogPreference{
+
+	private FetchPreferenceBinding binding;
 
 	private EditText mEditText;
 
@@ -52,8 +55,9 @@ public class FetchEditTextPreference extends DialogPreference{
 	@Override
 	protected View onCreateDialogView() {
 		View root = super.onCreateDialogView();
-		mEditText = (EditText) root.findViewById(R.id.edit);
-		mButton = (ImageButton) root.findViewById(R.id.button);
+		binding = FetchPreferenceBinding.bind(root);
+		mEditText = binding.edit;
+		mButton = binding.button;
 		return root;
 	}
 

@@ -28,4 +28,16 @@ limitations under the License.
     android:title="@string/settings_backup_restore"
     android:summary="@string/settings_backup_restore_summary"
      />
+  <Preference
+      android:key="@string/settings_backup_to_file_key"
+      android:persistent="false"
+      android:title="@string/settings_backup_to_file"
+      android:summary="Pick a location for backup"
+      />
+  <Preference
+      android:key="@string/settings_restore_from_file_key"
+      android:persistent="false"
+      android:title="@string/settings_restore_from_file"
+      android:summary="Pick a file to restore"
+      />
 </PreferenceScreen>
