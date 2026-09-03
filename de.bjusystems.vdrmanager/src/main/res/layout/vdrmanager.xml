@@ -41,16 +41,6 @@
 			android:drawableTop="@drawable/btn_epglist"
 			android:text="@string/action_menu_epg"
 			android:textColor="#FFF" />
-
-		<Button
-			android:id="@+id/action_menu_search"
-			android:layout_width="0dip"
-			android:layout_height="wrap_content"
-			android:layout_weight="1"
-			android:background="@android:drawable/list_selector_background"
-			android:drawableTop="@drawable/btn_search"
-			android:text="@string/action_menu_search"
-			android:textColor="#FFF" />
 	</LinearLayout>
 
 
@@ -72,14 +62,13 @@
 			android:textColor="#FFF" />
 
 		<Button
-			android:id="@+id/action_menu_timers"
+			android:id="@+id/action_menu_search"
 			android:layout_width="0dip"
 			android:layout_height="wrap_content"
 			android:layout_weight="1"
 			android:background="@android:drawable/list_selector_background"
-			android:cacheColorHint="?android:attr/colorBackground"
-			android:drawableTop="@drawable/btn_timer"
-			android:text="@string/action_menu_timers"
+			android:drawableTop="@drawable/btn_search"
+			android:text="@string/action_menu_search"
 			android:textColor="#FFF" />
 	</LinearLayout>
 
@@ -91,6 +80,17 @@
 		android:orientation="horizontal">
 
 		<Button
+			android:id="@+id/action_menu_timers"
+			android:layout_width="0dip"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:background="@android:drawable/list_selector_background"
+			android:cacheColorHint="?android:attr/colorBackground"
+			android:drawableTop="@drawable/btn_timer"
+			android:text="@string/action_menu_timers"
+			android:textColor="#FFF" />
+
+		<Button
 			android:id="@+id/action_menu_wakeup"
 			android:layout_width="0dip"
 			android:layout_height="wrap_content"
@@ -98,10 +98,17 @@
 			android:background="@android:drawable/list_selector_background"
 			android:cacheColorHint="?android:attr/colorBackground"
 			android:drawableTop="@drawable/btn_wakeup"
-
 			android:padding="5dip"
 			android:text="@string/action_menu_wakeup"
 			android:textColor="#FFF" />
+	</LinearLayout>
+
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="0dip"
+		android:layout_weight="1"
+		android:orientation="horizontal">
 
 		<Button
 			android:id="@+id/action_menu_remote"
@@ -114,6 +121,11 @@
 			android:padding="5dip"
 			android:text="@string/action_menu_remote"
 			android:textColor="#FFF" />
+
+		<View
+			android:layout_width="0dip"
+			android:layout_height="wrap_content"
+			android:layout_weight="1" />
 	</LinearLayout>
 
 </LinearLayout>
