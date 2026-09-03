@@ -707,6 +707,28 @@ public class Utils {
     }
 
     /**
+     * Sets start and stop time of a timer based on an event and the configured margins.
+     * Ensures the start time is not in the past if the broadcast has already started.
+     *
+     * @param timer The timer to update
+     * @param event The event to base the times on
+     */
+    public static void setTimerStartStopWithMargins(Timer timer, Event event) {
+        Preferences prefs = Preferences.get();
+        long now = System.currentTimeMillis();
+
+        long start = event.getStart().getTime() - prefs.getTimerPreMargin() * 60000L;
+        if (start < now && event.getStart().getTime() < now) {
+            start = now;
+        }
+
+        long stop = event.getStop().getTime() + prefs.getTimerPostMargin() * 60000L;
+
+        timer.setStart(new Date(start));
+        timer.setStop(new Date(stop));
+    }
+
+    /**
      * Format audio string.
      *
      * @param context the context

@@ -104,13 +104,7 @@ public class EpgDetailsActivity extends AppCompatActivity implements
 
             final Timer timer = new Timer(cEvent);
 
-            Date start = new Date(timer.getStart().getTime()
-                    - Preferences.get().getTimerPreMargin() * 60000);
-            timer.setStart(start);
-
-            Date end = new Date(timer.getStop().getTime()
-                    + Preferences.get().getTimerPostMargin() * 60000);
-            timer.setStop(end);
+            Utils.setTimerStartStopWithMargins(timer, cEvent);
 
             final CreateTimerTask task = new CreateTimerTask(
                     EpgDetailsActivity.this, timer) {

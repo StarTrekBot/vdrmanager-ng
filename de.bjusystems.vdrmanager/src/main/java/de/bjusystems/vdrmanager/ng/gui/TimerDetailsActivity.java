@@ -148,11 +148,8 @@ public class TimerDetailsActivity extends AppCompatActivity
             binding.timerDetailPriority.setText(String.valueOf(prefs.getTimerDefaultPriority()));
             binding.timerDetailLifetime.setText(String.valueOf(prefs.getTimerDefaultLifetime()));
 
-            Date start = new Date(timer.getStart().getTime() - prefs.getTimerPreMargin() * 60000);
-            timer.setStart(start);
-            Date end = new Date(timer.getStop().getTime() + prefs.getTimerPostMargin() * 60000);
-            timer.setStop(end);
-            updateDates(start, end);
+            Utils.setTimerStartStopWithMargins(timer, original);
+            updateDates(timer.getStart(), timer.getStop());
         } else if (op == TimerOperation.MODIFY) {
             binding.timerDetailsSave.setVisibility(View.GONE);
             binding.timerDetailsModify.setVisibility(View.VISIBLE);
